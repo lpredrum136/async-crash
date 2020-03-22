@@ -1,0 +1,32 @@
+async function always return a promise, therefore you can do 'return something;' at the end of async function.
+if that something is a promise, good!
+if that something is, for example, a number, the async function will automatically wraps that number in a promise that resolve(the number)
+you can even return like "return number + 1". then it will be resolve(number + 1)
+so after that we can call async function().then(value => {}) with the value here being THAT number that is inside (resolve)
+
+so if you have an async function declared like: async getThis() { await getThat() } because getThat is an async operation as well, and if you want to call getThis somewhere, you need to make sure it's called as await getThis(), meaning it needs to be inside of async something() { await getThis() }
+
+await something. Something here must be a Promise (new Promise for example) or something that RETURNS a promise(for example, a function that RETURNS
+a promise)
+and await something DOES NOT return a promise. it returns the VALUE in resolve() of the Promise that it was awaiting.
+in other words, you CANNOT call await something.then()
+
+at the end of a promise, if you "return sth", you return a RESOLVED promise with that value, resolve(value). In short, you actually return
+that value, which is implicitly wrapped in resolve(value)
+
+similarly, if you return new Promise((res, rej) => {..... resolve(value)}), when it resolves, you are actually returning a resolved promise
+or in other words, you are returning the value in resolve()
+
+every function in .then(value => {....}) is executed asynchronously. for example, if in {...} we have a set timeout and a return, 
+they are executed at the same time, but as setTimeout has to wait, the return finishes first, which - in this case as it's a "then",
+returns a resolved promise, or a value (in "return <value>") implicitly wrapped in resolve(value), which thent triggers the next .then().
+The setTimeout continues to do what it does, even long after the promise is resolved with "return".
+
+when you use "return" or implicitly "return" with arrow function {...() => 42}, 
+that means the promise is resolved, even when the () => 42 belongs to a catch block from previous promise. That means you should use 
+.then() after that. Otherwise, if you want to reject the promise, use "throw" or reject()
+
+Also, when you use "return" something, you effectively end that promise. For example, if you use .then(() => {...return sth}) and .catch()
+right after that, you are not catching the error of the very first promise - the original promise. Instead, you are catching error of the
+.then() promise, which - in this case - is none because you have used "return" in the .then(), which means you return a resolved promise
+
